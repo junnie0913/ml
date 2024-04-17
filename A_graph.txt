@@ -1,0 +1,160 @@
+import java.util.*;
+
+public class Astar_graph {
+    static class Node {
+        char name;
+        double g; // Cost from start node to current node
+        double h; // Heuristic value of the node
+        double f; // f = g + h
+        Node parent;
+        List<Edge> edges; 
+
+        Node(char name, double h) {
+            this.name = name;
+            this.h = h;
+            this.g = Double.MAX_VALUE;
+            this.f = Double.MAX_VALUE;
+            this.parent = null;
+        }
+    }
+
+    static class Edge {
+        Node source;
+        Node destination;
+        double cost;
+
+        Edge(Node source, Node destination, double cost) {
+            this.source = source;
+            this.destination = destination;
+            this.cost = cost;
+        }
+    }
+
+    static Map<Character, Node> graph = new HashMap<>();
+
+    public static void main(String[] args) {
+        initializeGraph();
+
+        Node result = aStarAlgorithm('S', 'G');
+        if (result != null) {
+            System.out.println("Shortest path cost: " + result.g);
+            printPath(result);
+        } else {
+            System.out.println("No path found!");
+        }
+    }
+
+    static void initializeGraph() {
+        graph.put('S', new Node('S', 6));
+        graph.put('A', new Node('A', 4));
+        graph.put('B', new Node('B', 4));
+        graph.put('C', new Node('C', 4));
+        graph.put('D', new Node('D', 3.5));
+        graph.put('E', new Node('E', 1));
+        graph.put('F', new Node('F', 1));
+        graph.put('G', new Node('G', 0));
+
+        addEdge('S', 'A', 2);
+        addEdge('S', 'B', 3);
+        addEdge('A', 'C', 3);
+        addEdge('B', 'C', 1);
+        addEdge('B', 'D', 3);
+        addEdge('C', 'D', 1);
+        addEdge('C', 'E', 3);
+        addEdge('D', 'F', 2);
+        addEdge('E', 'G', 2);
+        addEdge('F', 'G', 1);
+    }
+
+    static void addEdge(char source, char destination, double cost) {
+        Node src = graph.get(source);
+        Node dest = graph.get(destination);
+        if (src != null && dest != null) {
+            Edge edge = new Edge(src, dest, cost);
+            src.h = getHeuristicValue(source);
+            if (graph.containsKey(source)) {
+                List<Edge> edges = graph.get(source).edges;
+                if (edges == null) {
+                    edges = new ArrayList<>();
+                }
+                edges.add(edge);
+                graph.get(source).edges = edges;
+            } else {
+                List<Edge> edges = new ArrayList<>();
+                edges.add(edge);
+                graph.get(source).edges = edges;
+            }
+        }
+    }
+
+    static double getHeuristicValue(char nodeName) {
+        switch (nodeName) {
+            case 'A':
+                return 4;
+            case 'B':
+                return 4;
+            case 'C':
+                return 4;
+            case 'D':
+                return 3.5;
+            case 'E':
+                return 1;
+            case 'F':
+                return 1;
+            case 'G':
+                return 0;
+            default:
+                return 0;
+        }
+    }
+
+    static Node aStarAlgorithm(char startNode, char goalNode) {
+        PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(a -> a.f));
+        Map<Node, Double> costSoFar = new HashMap<>();
+        Node start = graph.get(startNode);
+        Node goal = graph.get(goalNode);
+
+        if (start == null || goal == null) {
+            return null;
+        }
+
+        start.g = 0;
+        start.f = start.h;
+        openSet.add(start);
+
+        while (!openSet.isEmpty()) {
+            Node current = openSet.poll();
+
+            if (current.equals(goal)) {
+                return current;
+            }
+
+            for (Edge edge : current.edges) {
+                Node neighbor = edge.destination;
+                double newCost = current.g + edge.cost;
+
+                if (newCost < neighbor.g) {
+                    neighbor.parent = current;
+                    neighbor.g = newCost;
+                    neighbor.f = neighbor.g + neighbor.h;
+                    costSoFar.put(neighbor, neighbor.g);
+                    openSet.add(neighbor);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static void printPath(Node goalNode) {
+        List<Character> path = new ArrayList<>();
+        Node current = goalNode;
+
+        while (current != null) {
+            path.add(0, current.name);
+            current = current.parent;
+        }
+
+        System.out.println("Shortest path: " + path);
+    }
+}

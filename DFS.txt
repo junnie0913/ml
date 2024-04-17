@@ -1,0 +1,65 @@
+import java.util.*;
+
+class Graph {
+    private int V; // Number of vertices
+    private List<Integer>[] adj_list; // Adjacency list representation
+
+    Graph(int v) {
+        V = v;
+        adj_list = new ArrayList[V];
+        for (int i = 0; i < V; ++i)
+            adj_list[i] = new ArrayList<>();
+    }
+
+    // Add an edge to the graph
+    void addEdge(int v, int w) {
+        adj_list[v].add(w);
+    }
+
+    
+    boolean DFS(int v, int destNode, boolean[] visited) {
+        visited[v] = true;
+        System.out.print(v + " ");
+
+        if (v == destNode) {
+            return true;
+        }
+
+        for (Integer neighbor : adj_list[v]) {
+            if (!visited[neighbor]) {
+                if (DFS(neighbor, destNode, visited)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+        public static void main(String args[]) {
+        Graph graph = new Graph(6);
+
+        // Define the fixed graph with 6 nodes and 7 edges (including a loop)
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(2, 4);
+        graph.addEdge(3, 5);
+        graph.addEdge(4, 1); // Creating a loop
+        graph.addEdge(4, 5);
+
+        Scanner scanner = new Scanner(System.in);
+        
+       System.out.println("Enter the starting node (0 to 5):");
+        int startNode = scanner.nextInt();
+
+        System.out.println("Enter the destination node (0 to 5):");
+        int destNode = scanner.nextInt();
+        boolean[] visited = new boolean[6];
+        System.out.print("DFS Path from source to destination: ");
+        System.out.println();
+        graph.DFS(startNode, destNode,visited);
+
+        
+    }
+}
